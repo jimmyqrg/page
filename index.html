@@ -80,13 +80,12 @@
             height: 120px;
         }
 
-        /* Toggle button */
+        /* Toggle button - stays on menu */
         .toggle-btn {
-            background-color: var(--bg-tertiary);
+            background-color: transparent;
             color: var(--text-primary);
             border: none;
-            border-radius: 50%;
-            width: 36px;
+            width: 80px;
             height: 36px;
             display: flex;
             align-items: center;
@@ -94,12 +93,28 @@
             cursor: pointer;
             position: absolute;
             top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
             transition: transform 0.3s ease;
-            box-shadow: 0 2px 8px var(--shadow);
+            z-index: 10;
         }
-
+        
         .toggle-btn:hover {
-            background-color: var(--accent);
+            color: var(--accent);
+        }
+        
+        .toggle-btn:hover .double-arrow {
+            background-color: var(--bg-tertiary);
+        }
+        
+        .double-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
         }
 
         /* Menu content (hidden when collapsed) */
@@ -513,7 +528,9 @@
         <div class="menu-container">
             <div class="bottom-menu" id="bottomMenu">
                 <button class="toggle-btn" id="toggleMenu">
-                    <span class="material-icons" id="toggleIcon">expand_less</span>
+                    <div class="double-arrow">
+                        <span class="material-icons" id="toggleIcon">keyboard_double_arrow_up</span>
+                    </div>
                 </button>
                 
                 <div class="menu-content" id="menuContent">
