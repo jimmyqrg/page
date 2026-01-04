@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | Jimmy Q.R.G</title>
+    <title>Teacher Portal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="icon" href="https://www.jimmyqrg.com/icon.png">
     <style>
         * {
             margin: 0;
@@ -134,6 +133,16 @@
         .menu-btn:hover {
             background-color: var(--bg-tertiary);
             color: var(--text-primary);
+        }
+
+        .menu-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .menu-btn:disabled:hover {
+            background-color: transparent;
+            color: var(--text-secondary);
         }
 
         .menu-btn.active {
@@ -405,14 +414,39 @@
             background-color: var(--border);
         }
 
-        .fullscreen-iframe {
+        /* Notification messages */
+        .notification {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 999;
-            background-color: var(--bg-primary);
+            top: 20px;
+            right: 20px;
+            background-color: var(--bg-secondary);
+            border-left: 4px solid var(--accent);
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px var(--shadow);
+            z-index: 2000;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            max-width: 400px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            border-left-color: var(--danger);
+        }
+
+        .notification .notification-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .notification .notification-message {
+            color: var(--text-secondary);
+            font-size: 14px;
         }
 
         /* Redirect overlay */
@@ -460,6 +494,9 @@
     </style>
 </head>
 <body>
+    <!-- Notification container -->
+    <div id="notificationContainer"></div>
+
     <!-- Redirect overlay (shown conditionally) -->
     <div id="redirectOverlay" class="redirect-overlay" style="display: none;">
         <div class="spinner"></div>
@@ -470,7 +507,7 @@
 
     <!-- Main content (shown if no redirect) -->
     <div id="mainContent" class="content">
-        <iframe id="main-iframe" src="https://teacher.jimmyqrg.com?page=extend" title="Teacher Portal"></iframe>
+        <iframe id="main-iframe" src="https://teacher.jimmyqrg.com/?page=extend" title="Teacher Portal"></iframe>
         
         <div class="menu-container">
             <div class="bottom-menu" id="bottomMenu">
@@ -479,9 +516,14 @@
                 </button>
                 
                 <div class="menu-content" id="menuContent">
-                    <button class="menu-btn" id="btnHome" data-url="https://teacher.jimmyqrg.com?page=extend">
+                    <button class="menu-btn" id="btnHome" data-url="https://teacher.jimmyqrg.com/?page=extend">
                         <span class="material-icons icon">home</span>
                         <span class="text">Home</span>
+                    </button>
+                    
+                    <button class="menu-btn" id="btnSound">
+                        <span class="material-icons icon" id="soundIcon">volume_up</span>
+                        <span class="text">Sound On</span>
                     </button>
                     
                     <button class="menu-btn" id="btnRefresh">
@@ -489,14 +531,9 @@
                         <span class="text">Refresh</span>
                     </button>
                     
-                    <button class="menu-btn" id="btnBack">
-                        <span class="material-icons icon">arrow_back</span>
-                        <span class="text">Back</span>
-                    </button>
-                    
-                    <button class="menu-btn" id="btnForward">
-                        <span class="material-icons icon">arrow_forward</span>
-                        <span class="text">Forward</span>
+                    <button class="menu-btn" id="btnDownload">
+                        <span class="material-icons icon">download</span>
+                        <span class="text">Download</span>
                     </button>
                     
                     <button class="menu-btn" id="btnFullscreen">
@@ -568,12 +605,14 @@
         const toggleMenu = document.getElementById('toggleMenu');
         const toggleIcon = document.getElementById('toggleIcon');
         const menuContent = document.getElementById('menuContent');
+        const notificationContainer = document.getElementById('notificationContainer');
         
         // Menu buttons
         const btnHome = document.getElementById('btnHome');
+        const btnSound = document.getElementById('btnSound');
+        const soundIcon = document.getElementById('soundIcon');
         const btnRefresh = document.getElementById('btnRefresh');
-        const btnBack = document.getElementById('btnBack');
-        const btnForward = document.getElementById('btnForward');
+        const btnDownload = document.getElementById('btnDownload');
         const btnFullscreen = document.getElementById('btnFullscreen');
         const btnCloak = document.getElementById('btnCloak');
         
@@ -593,6 +632,7 @@
         // State variables
         let isMenuExpanded = false;
         let isFullscreen = false;
+        let isSoundOn = true;
         let selectedIcon = 'default.png';
         const iconOptions = [
             { name: 'Default', url: 'https://teacher.jimmyqrg.com/cloak-images/default.png' },
@@ -600,7 +640,7 @@
             { name: 'Drive', url: 'https://teacher.jimmyqrg.com/cloak-images/drive.png' },
             { name: 'Docs', url: 'https://teacher.jimmyqrg.com/cloak-images/docs.png' },
             { name: 'Forms', url: 'https://teacher.jimmyqrg.com/cloak-images/forms.png' },
-            { name: 'Pausd', url: 'https://teacher.jimmyqrg.com/cloak-images/pausd.png' },
+            { name: 'Pause', url: 'https://teacher.jimmyqrg.com/cloak-images/pause.png' },
             { name: 'Schoology', url: 'https://teacher.jimmyqrg.com/cloak-images/schoology.png' },
             { name: 'JimmyQRG', url: 'https://www.jimmyqrg.com/icon.png' }
         ];
@@ -638,29 +678,28 @@
             let hasPAUSDDomain = false;
             
             // Try to get user email (simulated for this demo)
-            // In a real implementation, you would integrate with an authentication system
             try {
                 // For demo purposes, we'll check if there's a stored email
                 const storedEmail = localStorage.getItem('userEmail');
                 
                 if (storedEmail) {
                     userEmail = storedEmail;
-                    hasPAUSDDomain = userEmail.endsWith('pausd.org');
+                    hasPAUSDDomain = userEmail.endsWith('pausd.us');
                 } else {
                     // Simulate asking for email access
                     const email = await requestEmailAccess();
                     if (email) {
                         userEmail = email;
-                        hasPAUSDDomain = email.endsWith('pausd.org');
+                        hasPAUSDDomain = email.endsWith('pausd.us');
                         localStorage.setItem('userEmail', email);
                     } else {
-                        // User rejected access, assume pausd.org
+                        // User rejected access, assume pausd.us
                         hasPAUSDDomain = true;
                     }
                 }
             } catch (error) {
                 console.log('Error accessing email:', error);
-                // If we can't access email, assume pausd.org
+                // If we can't access email, assume pausd.us
                 hasPAUSDDomain = true;
             }
             
@@ -677,11 +716,12 @@
         function requestEmailAccess() {
             return new Promise((resolve) => {
                 // In a real implementation, this would be an actual permission request
-                // For this demo, we'll simulate it with a prompt
                 const simulatePermissionRequest = confirm("This site would like to access your email address to determine if you need to be redirected. Allow access?");
                 
                 if (simulatePermissionRequest) {
-                    // For demo, we'll just return a random email (not pausd.org)
+                    // For demo, we'll return a random email
+                    // Change to 'user@pausd.us' to test redirect
+                    // Change to 'user@example.com' to test no redirect
                     resolve('user@example.com');
                 } else {
                     resolve(null);
@@ -715,6 +755,11 @@
                     if (cloakModal.classList.contains('active')) {
                         closeCloakModal();
                     }
+                    
+                    // Also exit fullscreen if active
+                    if (isFullscreen) {
+                        exitFullscreen();
+                    }
                 }
             });
             
@@ -724,20 +769,14 @@
                 collapseMenu();
             });
             
+            btnSound.addEventListener('click', toggleSound);
+            
             btnRefresh.addEventListener('click', () => {
                 mainIframe.contentWindow.location.reload();
                 collapseMenu();
             });
             
-            btnBack.addEventListener('click', () => {
-                mainIframe.contentWindow.history.back();
-                collapseMenu();
-            });
-            
-            btnForward.addEventListener('click', () => {
-                mainIframe.contentWindow.history.forward();
-                collapseMenu();
-            });
+            btnDownload.addEventListener('click', downloadSource);
             
             btnFullscreen.addEventListener('click', toggleFullscreen);
             
@@ -766,6 +805,12 @@
             manualRedirect.addEventListener('click', () => {
                 window.location.href = 'https://www.jimmyqrg.com/signup/';
             });
+            
+            // Fullscreen change listener
+            document.addEventListener('fullscreenchange', handleFullscreenChange);
+            document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+            document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+            document.addEventListener('MSFullscreenChange', handleFullscreenChange);
         }
         
         function toggleMenuState() {
@@ -788,46 +833,138 @@
             isMenuExpanded = false;
         }
         
+        function toggleSound() {
+            isSoundOn = !isSoundOn;
+            
+            if (isSoundOn) {
+                soundIcon.textContent = 'volume_up';
+                btnSound.querySelector('.text').textContent = 'Sound On';
+                // In a real implementation, you would unmute the iframe here
+                // Note: This is challenging due to browser security restrictions
+            } else {
+                soundIcon.textContent = 'volume_off';
+                btnSound.querySelector('.text').textContent = 'Sound Off';
+                // In a real implementation, you would mute the iframe here
+                // Note: This is challenging due to browser security restrictions
+            }
+            
+            collapseMenu();
+        }
+        
+        async function downloadSource() {
+            try {
+                // Check if user has pausd.us email
+                const userEmail = localStorage.getItem('userEmail') || '';
+                const hasPAUSDDomain = userEmail.endsWith('pausd.us');
+                
+                if (!hasPAUSDDomain) {
+                    showNotification('Unable to download', 'An unknown error occurred during the download', 'error');
+                    return;
+                }
+                
+                // Get current iframe URL
+                const iframeUrl = mainIframe.src;
+                
+                // Try to fetch the source code
+                const response = await fetch(iframeUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const sourceCode = await response.text();
+                
+                // Create a blob and download link
+                const blob = new Blob([sourceCode], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'website_source.html';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showNotification('Download Successful', 'Source code has been downloaded.', 'success');
+                
+            } catch (error) {
+                console.error('Download error:', error);
+                
+                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                    showNotification('Unable to fetch source', 'The website source code could not be accessed.', 'error');
+                } else {
+                    showNotification('Unable to download', 'An unknown error occurred during download.', 'error');
+                }
+            }
+            
+            collapseMenu();
+        }
+        
         function toggleFullscreen() {
             if (!isFullscreen) {
-                // Enter fullscreen
-                const iframeParent = mainIframe.parentElement;
-                iframeParent.classList.add('fullscreen-iframe');
-                document.body.style.overflow = 'hidden';
-                isFullscreen = true;
-                
-                // Add event listener for fullscreen exit
-                document.addEventListener('fullscreenchange', handleFullscreenChange);
-                document.addEventListener('keydown', handleFullscreenKey);
+                enterFullscreen();
             } else {
-                // Exit fullscreen
                 exitFullscreen();
             }
             
             collapseMenu();
+        }
+        
+        function enterFullscreen() {
+            const iframeElement = mainIframe;
+            
+            // Use the Fullscreen API
+            if (iframeElement.requestFullscreen) {
+                iframeElement.requestFullscreen();
+            } else if (iframeElement.webkitRequestFullscreen) {
+                iframeElement.webkitRequestFullscreen();
+            } else if (iframeElement.mozRequestFullScreen) {
+                iframeElement.mozRequestFullScreen();
+            } else if (iframeElement.msRequestFullscreen) {
+                iframeElement.msRequestFullscreen();
+            }
+            
+            isFullscreen = true;
+            
+            // Update button text/icon
+            btnFullscreen.querySelector('.icon').textContent = 'fullscreen_exit';
+            btnFullscreen.querySelector('.text').textContent = 'Exit Fullscreen';
         }
         
         function exitFullscreen() {
-            const iframeParent = mainIframe.parentElement;
-            iframeParent.classList.remove('fullscreen-iframe');
-            document.body.style.overflow = '';
-            isFullscreen = false;
-            collapseMenu();
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
             
-            // Remove event listeners
-            document.removeEventListener('fullscreenchange', handleFullscreenChange);
-            document.removeEventListener('keydown', handleFullscreenKey);
+            isFullscreen = false;
+            
+            // Update button text/icon
+            btnFullscreen.querySelector('.icon').textContent = 'fullscreen';
+            btnFullscreen.querySelector('.text').textContent = 'Fullscreen';
+            
+            collapseMenu();
         }
         
         function handleFullscreenChange() {
-            if (!document.fullscreenElement) {
-                exitFullscreen();
-            }
-        }
-        
-        function handleFullscreenKey(e) {
-            if (e.key === 'Escape') {
-                exitFullscreen();
+            isFullscreen = !!(document.fullscreenElement || 
+                            document.webkitFullscreenElement || 
+                            document.mozFullScreenElement || 
+                            document.msFullscreenElement);
+            
+            // Update button state
+            if (isFullscreen) {
+                btnFullscreen.querySelector('.icon').textContent = 'fullscreen_exit';
+                btnFullscreen.querySelector('.text').textContent = 'Exit Fullscreen';
+            } else {
+                btnFullscreen.querySelector('.icon').textContent = 'fullscreen';
+                btnFullscreen.querySelector('.text').textContent = 'Fullscreen';
+                collapseMenu();
             }
         }
         
@@ -895,7 +1032,7 @@
             if (!file) return;
             
             if (!file.type.startsWith('image/')) {
-                alert('Please upload an image file');
+                showNotification('Invalid File', 'Please upload an image file.', 'error');
                 return;
             }
             
@@ -981,16 +1118,12 @@
             
             // Apply cloak if default is off
             if (!defaultCloak.checked) {
-                // In a real implementation, you would change the tab title and favicon
-                // For security reasons, browsers restrict changing favicon dynamically
-                // This is a simplified version for demonstration
-                
                 // Change tab title
                 if (tabName.value) {
                     document.title = tabName.value;
                 }
                 
-                // Try to change favicon (may not work in all browsers due to security restrictions)
+                // Try to change favicon
                 try {
                     let favicon = document.querySelector("link[rel*='icon']");
                     if (!favicon) {
@@ -1012,6 +1145,38 @@
             }
             
             closeCloakModal();
+        }
+        
+        function showNotification(title, message, type = 'info') {
+            // Remove any existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => {
+                notification.remove();
+            });
+            
+            // Create new notification
+            const notification = document.createElement('div');
+            notification.className = `notification ${type === 'error' ? 'error' : ''}`;
+            
+            notification.innerHTML = `
+                <div class="notification-title">${title}</div>
+                <div class="notification-message">${message}</div>
+            `;
+            
+            notificationContainer.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 5000);
         }
         
         // Initialize the application
