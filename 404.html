@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>401 — Jimmy Q.R.G. Unlimited Learning</title>
+<link rel="icon" type="image/png" href="/icon.png">
+<link rel="shortcut icon" href="/icon.png" type="image/png">
+<link rel="apple-touch-icon" href="/icon.png">
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Josefin+Sans:wght@300;400;600&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<style>
+:root {
+    --blue: #1d4ed8;
+    --light-blue: #3b82f6;
+    --bg: #f6f9fc;
+    --text-dark: #1b1b1b;
+    --muted: #666;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --blue: #1746ac;
+        --light-blue: #112c67;
+        --bg:#000000;
+        --text-dark:#9cafc9;
+        --muted:#6b7280;
+    }
+}
+
+* { box-sizing: border-box; margin:0; padding:0; }
+
+body {
+    font-family: "Quicksand", sans-serif;
+    background: var(--bg);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: var(--blue);
+    padding: 15px 30px;
+    z-index: 1000;
+}
+
+.top-bar a {
+    color: white;
+    text-decoration: none;
+    font-family: "Great Vibes", cursive;
+    font-size: 36px;
+    cursor: default;
+}
+
+.error-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 150px 20px 50px 20px; /* ensures space below top bar */
+    text-align: center;
+}
+
+.error-container h1 {
+    font-family: "Ariel", sans-serif;
+    font-size: 100px;
+    color: var(--blue);
+    margin-bottom: 20px;
+}
+
+.error-container h2 {
+    font-family: "Josefin Sans", sans-serif;
+    font-size: 32px;
+    margin-bottom: 30px;
+}
+
+.error-container p {
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 700px;
+    margin: 0 auto 30px auto;
+    line-height: 1.6;
+}
+
+.error-container a {
+    display: inline-block;
+    text-decoration: none;
+    background: var(--blue);
+    color: white;
+    font-family: "Poppins", sans-serif;
+    font-weight: bold;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-size: 18px;
+}
+
+.error-container a:hover {
+    background: var(--light-blue);
+}
+
+@media (max-width: 600px) {
+    .error-container h1 {
+        font-size: 60px;
+    }
+    .error-container h2 {
+        font-size: 24px;
+    }
+}
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="top-bar">
+    <a href="/">Jimmy Q.R.G.</a>
+</div>
+
+<!-- Error content -->
+<div class="error-container">
+    <h1>401</h1>
+    <h2>Login to continue</h2>
+    <a href="https://www.jimmyqrg.com/login/">Login</a>
+</div>
+
+</body>
+</html>
