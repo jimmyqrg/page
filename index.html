@@ -640,7 +640,7 @@
             { name: 'Drive', url: 'https://teacher.jimmyqrg.com/cloak-images/drive.png' },
             { name: 'Docs', url: 'https://teacher.jimmyqrg.com/cloak-images/docs.png' },
             { name: 'Forms', url: 'https://teacher.jimmyqrg.com/cloak-images/forms.png' },
-            { name: 'Pause', url: 'https://teacher.jimmyqrg.com/cloak-images/pause.png' },
+            { name: 'Pausd', url: 'https://teacher.jimmyqrg.com/cloak-images/pausd.png' },
             { name: 'Schoology', url: 'https://teacher.jimmyqrg.com/cloak-images/schoology.png' },
             { name: 'JimmyQRG', url: 'https://www.jimmyqrg.com/icon.png' }
         ];
@@ -858,7 +858,7 @@
                 const hasPAUSDDomain = userEmail.endsWith('pausd.us');
                 
                 if (!hasPAUSDDomain) {
-                    showNotification('Unable to download', 'An unknown error occurred during the download', 'error');
+                    showNotification('Unable to download', 'An unknown error occurred while downloading.', 'error');
                     return;
                 }
                 
@@ -893,7 +893,7 @@
                 if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
                     showNotification('Unable to fetch source', 'The website source code could not be accessed.', 'error');
                 } else {
-                    showNotification('Unable to download', 'An unknown error occurred during download.', 'error');
+                    showNotification('Unable to download', 'An unknown error occurred while downloading.', 'error');
                 }
             }
             
