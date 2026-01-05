@@ -539,9 +539,10 @@
                         <span class="text">Home</span>
                     </button>
                     
-                    <button class="menu-btn" id="btnSound">
-                        <span class="material-icons icon" id="soundIcon">volume_up</span>
-                        <span class="text">Sound On</span>
+                    <!-- Changed from Sound to Games -->
+                    <button class="menu-btn" id="btnGames">
+                        <span class="material-icons icon" id="gamesIcon">sports_esports</span>
+                        <span class="text">Games</span>
                     </button>
                     
                     <button class="menu-btn" id="btnRefresh">
@@ -627,8 +628,8 @@
     
     // Menu buttons
     const btnHome = document.getElementById('btnHome');
-    const btnSound = document.getElementById('btnSound');
-    const soundIcon = document.getElementById('soundIcon');
+    const btnGames = document.getElementById('btnGames'); // Changed from btnSound to btnGames
+    const gamesIcon = document.getElementById('gamesIcon'); // Changed from soundIcon to gamesIcon
     const btnRefresh = document.getElementById('btnRefresh');
     const btnDownload = document.getElementById('btnDownload');
     const btnFullscreen = document.getElementById('btnFullscreen');
@@ -650,7 +651,6 @@
     // State variables
     let isMenuExpanded = false;
     let isFullscreen = false;
-    let isSoundOn = true;
     let selectedIcon = 'default.png';
     const iconOptions = [
         { name: 'Default', url: 'https://learn.jimmyqrg.com/cloak-images/default.png' },
@@ -702,22 +702,22 @@
             
             if (storedEmail) {
                 userEmail = storedEmail;
-                hasPAUSDDomain = userEmail.endsWith('pausd.us');
+                hasPAUSDDomain = userEmail.endsWith('pausd.org');
             } else {
                 // Simulate asking for email access
                 const email = await requestEmailAccess();
                 if (email) {
                     userEmail = email;
-                    hasPAUSDDomain = email.endsWith('pausd.us');
+                    hasPAUSDDomain = email.endsWith('pausd.org');
                     localStorage.setItem('userEmail', email);
                 } else {
-                    // User rejected access, assume pausd.us
+                    // User rejected access, assume pausd.org
                     hasPAUSDDomain = true;
                 }
             }
         } catch (error) {
             console.log('Error accessing email:', error);
-            // If we can't access email, assume pausd.us
+            // If we can't access email, assume pausd.org
             hasPAUSDDomain = true;
         }
         
@@ -738,7 +738,7 @@
             
             if (simulatePermissionRequest) {
                 // For demo, we'll return a random email
-                // Change to 'user@pausd.us' to test redirect
+                // Change to 'user@pausd.org' to test redirect
                 // Change to 'user@example.com' to test no redirect
                 resolve('user@example.com');
             } else {
@@ -787,7 +787,11 @@
             collapseMenu();
         });
         
-        btnSound.addEventListener('click', toggleSound);
+        // Games button - loads the games page
+        btnGames.addEventListener('click', () => {
+            mainIframe.src = 'https://learn.jimmyqrg.com/jqrg-games';
+            collapseMenu();
+        });
         
         btnRefresh.addEventListener('click', () => {
             mainIframe.contentWindow.location.reload();
@@ -857,34 +861,16 @@
         isMenuExpanded = false;
     }
     
-    function toggleSound() {
-        isSoundOn = !isSoundOn;
-        
-        if (isSoundOn) {
-            soundIcon.textContent = 'volume_up';
-            btnSound.querySelector('.text').textContent = 'Sound On';
-            // In a real implementation, you would unmute the iframe here
-            // Note: This is challenging due to browser security restrictions
-        } else {
-            soundIcon.textContent = 'volume_off';
-            btnSound.querySelector('.text').textContent = 'Sound Off';
-            // In a real implementation, you would mute the iframe here
-            // Note: This is challenging due to browser security restrictions
-        }
-        
-        collapseMenu();
-    }
-    
     async function downloadSource() {
         try {
             // Check if user has pausd.us email
             const userEmail = localStorage.getItem('userEmail') || '';
             const hasPAUSDDomain = userEmail.endsWith('pausd.us');
             
-            if (!hasPAUSDDomain) {
-                showNotification('Unable to download', 'An unknown error occurred while downloading.', 'error');
-                return;
-            }
+            // if (!hasPAUSDDomain) {
+            //     showNotification('Unable to download', 'An unknown error occurred while downloading.', 'error');
+            //     return;
+            // }
             
             // Get current iframe URL
             const iframeUrl = mainIframe.src;
