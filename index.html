@@ -615,590 +615,646 @@
     </div>
 
     <script>
-        // DOM Elements
-        const mainContent = document.getElementById('mainContent');
-        const redirectOverlay = document.getElementById('redirectOverlay');
-        const mainIframe = document.getElementById('main-iframe');
-        const bottomMenu = document.getElementById('bottomMenu');
-        const toggleMenu = document.getElementById('toggleMenu');
-        const toggleIcon = document.getElementById('toggleIcon');
-        const menuContent = document.getElementById('menuContent');
-        const notificationContainer = document.getElementById('notificationContainer');
+    // DOM Elements
+    const mainContent = document.getElementById('mainContent');
+    const redirectOverlay = document.getElementById('redirectOverlay');
+    const mainIframe = document.getElementById('main-iframe');
+    const bottomMenu = document.getElementById('bottomMenu');
+    const toggleMenu = document.getElementById('toggleMenu');
+    const toggleIcon = document.getElementById('toggleIcon');
+    const menuContent = document.getElementById('menuContent');
+    const notificationContainer = document.getElementById('notificationContainer');
+    
+    // Menu buttons
+    const btnHome = document.getElementById('btnHome');
+    const btnSound = document.getElementById('btnSound');
+    const soundIcon = document.getElementById('soundIcon');
+    const btnRefresh = document.getElementById('btnRefresh');
+    const btnDownload = document.getElementById('btnDownload');
+    const btnFullscreen = document.getElementById('btnFullscreen');
+    const btnCloak = document.getElementById('btnCloak');
+    
+    // Cloak modal elements
+    const cloakModal = document.getElementById('cloakModal');
+    const closeModal = document.getElementById('closeModal');
+    const defaultCloak = document.getElementById('defaultCloak');
+    const customCloakOptions = document.getElementById('customCloakOptions');
+    const iconGrid = document.getElementById('iconGrid');
+    const uploadArea = document.getElementById('uploadArea');
+    const fileUpload = document.getElementById('fileUpload');
+    const tabName = document.getElementById('tabName');
+    const applyCloak = document.getElementById('applyCloak');
+    const cancelCloak = document.getElementById('cancelCloak');
+    const manualRedirect = document.getElementById('manualRedirect');
+    
+    // State variables
+    let isMenuExpanded = false;
+    let isFullscreen = false;
+    let isSoundOn = true;
+    let selectedIcon = 'default.png';
+    const iconOptions = [
+        { name: 'Default', url: 'https://learn.jimmyqrg.com/cloak-images/default.png' },
+        { name: 'Gmail', url: 'https://learn.jimmyqrg.com/cloak-images/gmail.png' },
+        { name: 'Drive', url: 'https://learn.jimmyqrg.com/cloak-images/drive.png' },
+        { name: 'Docs', url: 'https://learn.jimmyqrg.com/cloak-images/docs.png' },
+        { name: 'Forms', url: 'https://learn.jimmyqrg.com/cloak-images/forms.png' },
+        { name: 'Pausd', url: 'https://learn.jimmyqrg.com/cloak-images/pausd.png' },
+        { name: 'Schoology', url: 'https://learn.jimmyqrg.com/cloak-images/schoology.png' },
+        { name: 'JimmyQRG', url: 'https://www.jimmyqrg.com/icon.png' }
+    ];
+    
+    // Initialize the page
+    function init() {
+        // Check if we should redirect
+        checkRedirect();
         
-        // Menu buttons
-        const btnHome = document.getElementById('btnHome');
-        const btnSound = document.getElementById('btnSound');
-        const soundIcon = document.getElementById('soundIcon');
-        const btnRefresh = document.getElementById('btnRefresh');
-        const btnDownload = document.getElementById('btnDownload');
-        const btnFullscreen = document.getElementById('btnFullscreen');
-        const btnCloak = document.getElementById('btnCloak');
+        // Setup event listeners
+        setupEventListeners();
         
-        // Cloak modal elements
-        const cloakModal = document.getElementById('cloakModal');
-        const closeModal = document.getElementById('closeModal');
-        const defaultCloak = document.getElementById('defaultCloak');
-        const customCloakOptions = document.getElementById('customCloakOptions');
-        const iconGrid = document.getElementById('iconGrid');
-        const uploadArea = document.getElementById('uploadArea');
-        const fileUpload = document.getElementById('fileUpload');
-        const tabName = document.getElementById('tabName');
-        const applyCloak = document.getElementById('applyCloak');
-        const cancelCloak = document.getElementById('cancelCloak');
-        const manualRedirect = document.getElementById('manualRedirect');
+        // Populate icon grid
+        populateIconGrid();
         
-        // State variables
-        let isMenuExpanded = false;
-        let isFullscreen = false;
-        let isSoundOn = true;
-        let selectedIcon = 'default.png';
-        const iconOptions = [
-            { name: 'Default', url: 'https://learn.jimmyqrg.com/cloak-images/default.png' },
-            { name: 'Gmail', url: 'https://learn.jimmyqrg.com/cloak-images/gmail.png' },
-            { name: 'Drive', url: 'https://learn.jimmyqrg.com/cloak-images/drive.png' },
-            { name: 'Docs', url: 'https://learn.jimmyqrg.com/cloak-images/docs.png' },
-            { name: 'Forms', url: 'https://learn.jimmyqrg.com/cloak-images/forms.png' },
-            { name: 'Pausd', url: 'https://learn.jimmyqrg.com/cloak-images/pausd.png' },
-            { name: 'Schoology', url: 'https://learn.jimmyqrg.com/cloak-images/schoology.png' },
-            { name: 'JimmyQRG', url: 'https://www.jimmyqrg.com/icon.png' }
+        // Load saved cloak settings
+        loadCloakSettings();
+    }
+    
+    // Check if we need to redirect based on URL and email
+    async function checkRedirect() {
+        const currentUrl = window.location.href;
+        const redirectUrls = [
+            'https://www.jimmyqrg.com/signup',
+            'https://www.jimmyqrg.com/signup/',
+            'https://www.jimmyqrg.com/join/index.html'
         ];
         
-        // Initialize the page
-        function init() {
-            // Check if we should redirect
-            checkRedirect();
-            
-            // Setup event listeners
-            setupEventListeners();
-            
-            // Populate icon grid
-            populateIconGrid();
-            
-            // Load saved cloak settings
-            loadCloakSettings();
+        // If we're already on a redirect URL, don't redirect
+        if (redirectUrls.some(url => currentUrl.includes(url))) {
+            return;
         }
         
-        // Check if we need to redirect based on URL and email
-        async function checkRedirect() {
-            const currentUrl = window.location.href;
-            const redirectUrls = [
-                'https://www.jimmyqrg.com/signup',
-                'https://www.jimmyqrg.com/signup/',
-                'https://www.jimmyqrg.com/join/index.html'
-            ];
+        let userEmail = '';
+        let hasPAUSDDomain = false;
+        
+        // Try to get user email (simulated for this demo)
+        try {
+            // For demo purposes, we'll check if there's a stored email
+            const storedEmail = localStorage.getItem('userEmail');
             
-            // If we're already on a redirect URL, don't redirect
-            if (redirectUrls.some(url => currentUrl.includes(url))) {
-                return;
-            }
-            
-            let userEmail = '';
-            let hasPAUSDDomain = false;
-            
-            // Try to get user email (simulated for this demo)
-            try {
-                // For demo purposes, we'll check if there's a stored email
-                const storedEmail = localStorage.getItem('userEmail');
-                
-                if (storedEmail) {
-                    userEmail = storedEmail;
-                    hasPAUSDDomain = userEmail.endsWith('pausd.us');
+            if (storedEmail) {
+                userEmail = storedEmail;
+                hasPAUSDDomain = userEmail.endsWith('pausd.us');
+            } else {
+                // Simulate asking for email access
+                const email = await requestEmailAccess();
+                if (email) {
+                    userEmail = email;
+                    hasPAUSDDomain = email.endsWith('pausd.us');
+                    localStorage.setItem('userEmail', email);
                 } else {
-                    // Simulate asking for email access
-                    const email = await requestEmailAccess();
-                    if (email) {
-                        userEmail = email;
-                        hasPAUSDDomain = email.endsWith('pausd.us');
-                        localStorage.setItem('userEmail', email);
-                    } else {
-                        // User rejected access, assume pausd.us
-                        hasPAUSDDomain = true;
-                    }
+                    // User rejected access, assume pausd.us
+                    hasPAUSDDomain = true;
                 }
-            } catch (error) {
-                console.log('Error accessing email:', error);
-                // If we can't access email, assume pausd.us
-                hasPAUSDDomain = true;
             }
+        } catch (error) {
+            console.log('Error accessing email:', error);
+            // If we can't access email, assume pausd.us
+            hasPAUSDDomain = true;
+        }
+        
+        // Conditions for redirect
+        if (hasPAUSDDomain) {
+            showRedirectOverlay();
+            setTimeout(() => {
+                window.location.href = 'https://www.jimmyqrg.com/signup/';
+            }, 3000);
+        }
+    }
+    
+    // Simulate requesting email access
+    function requestEmailAccess() {
+        return new Promise((resolve) => {
+            // In a real implementation, this would be an actual permission request
+            const simulatePermissionRequest = confirm("This site would like to access your email address to determine if you need to be redirected. Allow access?");
             
-            // Conditions for redirect
-            if (hasPAUSDDomain) {
-                showRedirectOverlay();
-                setTimeout(() => {
-                    window.location.href = 'https://www.jimmyqrg.com/signup/';
-                }, 3000);
+            if (simulatePermissionRequest) {
+                // For demo, we'll return a random email
+                // Change to 'user@pausd.us' to test redirect
+                // Change to 'user@example.com' to test no redirect
+                resolve('user@example.com');
+            } else {
+                resolve(null);
             }
-        }
+        });
+    }
+    
+    function showRedirectOverlay() {
+        redirectOverlay.style.display = 'flex';
+        mainContent.style.display = 'none';
+    }
+    
+    function setupEventListeners() {
+        // Toggle menu
+        toggleMenu.addEventListener('click', toggleMenuState);
         
-        // Simulate requesting email access
-        function requestEmailAccess() {
-            return new Promise((resolve) => {
-                // In a real implementation, this would be an actual permission request
-                const simulatePermissionRequest = confirm("This site would like to access your email address to determine if you need to be redirected. Allow access?");
-                
-                if (simulatePermissionRequest) {
-                    // For demo, we'll return a random email
-                    // Change to 'user@pausd.us' to test redirect
-                    // Change to 'user@example.com' to test no redirect
-                    resolve('user@example.com');
-                } else {
-                    resolve(null);
-                }
-            });
-        }
+        // Click iframe to collapse menu
+        mainIframe.addEventListener('click', () => {
+            if (isMenuExpanded) {
+                collapseMenu();
+            }
+        });
         
-        function showRedirectOverlay() {
-            redirectOverlay.style.display = 'flex';
-            mainContent.style.display = 'none';
-        }
-        
-        function setupEventListeners() {
-            // Toggle menu
-            toggleMenu.addEventListener('click', toggleMenuState);
-            
-            // Click iframe to collapse menu
-            mainIframe.addEventListener('click', () => {
+        // ESC key to collapse menu or close modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
                 if (isMenuExpanded) {
                     collapseMenu();
                 }
-            });
-            
-            // ESC key to collapse menu or close modal
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    if (isMenuExpanded) {
-                        collapseMenu();
-                    }
-                    
-                    if (cloakModal.classList.contains('active')) {
-                        closeCloakModal();
-                    }
-                    
-                    // Also exit fullscreen if active
-                    if (isFullscreen) {
-                        exitFullscreen();
-                    }
-                }
-            });
-            
-            // Menu button events
-            btnHome.addEventListener('click', () => {
-                mainIframe.src = btnHome.getAttribute('data-url');
-                collapseMenu();
-            });
-            
-            btnSound.addEventListener('click', toggleSound);
-            
-            btnRefresh.addEventListener('click', () => {
-                mainIframe.contentWindow.location.reload();
-                collapseMenu();
-            });
-            
-            btnDownload.addEventListener('click', downloadSource);
-            
-            btnFullscreen.addEventListener('click', toggleFullscreen);
-            
-            btnCloak.addEventListener('click', openCloakModal);
-            
-            // Cloak modal events
-            closeModal.addEventListener('click', closeCloakModal);
-            cloakModal.addEventListener('click', (e) => {
-                if (e.target === cloakModal) {
+                
+                if (cloakModal.classList.contains('active')) {
                     closeCloakModal();
                 }
-            });
-            
-            defaultCloak.addEventListener('change', toggleCustomCloakOptions);
-            
-            uploadArea.addEventListener('click', () => {
-                fileUpload.click();
-            });
-            
-            fileUpload.addEventListener('change', handleImageUpload);
-            
-            applyCloak.addEventListener('click', applyCloakSettings);
-            cancelCloak.addEventListener('click', closeCloakModal);
-            
-            // Redirect button
-            manualRedirect.addEventListener('click', () => {
-                window.location.href = 'https://www.jimmyqrg.com/signup/';
-            });
-            
-            // Fullscreen change listener
-            document.addEventListener('fullscreenchange', handleFullscreenChange);
-            document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-            document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-            document.addEventListener('MSFullscreenChange', handleFullscreenChange);
-        }
-        
-        function toggleMenuState() {
-            if (isMenuExpanded) {
-                collapseMenu();
-            } else {
-                expandMenu();
-            }
-        }
-        
-        function expandMenu() {
-            bottomMenu.classList.add('expanded');
-            toggleIcon.textContent = 'expand_more';
-            isMenuExpanded = true;
-        }
-        
-        function collapseMenu() {
-            bottomMenu.classList.remove('expanded');
-            toggleIcon.textContent = 'expand_less';
-            isMenuExpanded = false;
-        }
-        
-        function toggleSound() {
-            isSoundOn = !isSoundOn;
-            
-            if (isSoundOn) {
-                soundIcon.textContent = 'volume_up';
-                btnSound.querySelector('.text').textContent = 'Sound On';
-                // In a real implementation, you would unmute the iframe here
-                // Note: This is challenging due to browser security restrictions
-            } else {
-                soundIcon.textContent = 'volume_off';
-                btnSound.querySelector('.text').textContent = 'Sound Off';
-                // In a real implementation, you would mute the iframe here
-                // Note: This is challenging due to browser security restrictions
-            }
-            
-            collapseMenu();
-        }
-        
-        async function downloadSource() {
-            try {
-                // Check if user has pausd.us email
-                const userEmail = localStorage.getItem('userEmail') || '';
-                const hasPAUSDDomain = userEmail.endsWith('pausd.us');
                 
-                if (!hasPAUSDDomain) {
-                    showNotification('Unable to download', 'An unknown error occurred while downloading.', 'error');
-                    return;
-                }
-                
-                // Get current iframe URL
-                const iframeUrl = mainIframe.src;
-                
-                // Try to fetch the source code
-                const response = await fetch(iframeUrl);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-                const sourceCode = await response.text();
-                
-                // Create a blob and download link
-                const blob = new Blob([sourceCode], { type: 'text/html' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'website_source.html';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                showNotification('Download Successful', 'Source code has been downloaded.', 'success');
-                
-            } catch (error) {
-                console.error('Download error:', error);
-                
-                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-                    showNotification('Unable to fetch source', 'The website source code could not be accessed.', 'error');
-                } else {
-                    showNotification('Unable to download', 'An unknown error occurred while downloading.', 'error');
+                // Also exit fullscreen if active
+                if (isFullscreen) {
+                    exitFullscreen();
                 }
             }
-            
+        });
+        
+        // Menu button events
+        btnHome.addEventListener('click', () => {
+            mainIframe.src = btnHome.getAttribute('data-url');
             collapseMenu();
-        }
+        });
         
-        function toggleFullscreen() {
-            if (!isFullscreen) {
-                enterFullscreen();
-            } else {
-                exitFullscreen();
-            }
-            
+        btnSound.addEventListener('click', toggleSound);
+        
+        btnRefresh.addEventListener('click', () => {
+            mainIframe.contentWindow.location.reload();
             collapseMenu();
-        }
+        });
         
-        function enterFullscreen() {
-            const iframeElement = mainIframe;
-            
-            // Use the Fullscreen API
-            if (iframeElement.requestFullscreen) {
-                iframeElement.requestFullscreen();
-            } else if (iframeElement.webkitRequestFullscreen) {
-                iframeElement.webkitRequestFullscreen();
-            } else if (iframeElement.mozRequestFullScreen) {
-                iframeElement.mozRequestFullScreen();
-            } else if (iframeElement.msRequestFullscreen) {
-                iframeElement.msRequestFullscreen();
+        btnDownload.addEventListener('click', downloadSource);
+        
+        btnFullscreen.addEventListener('click', toggleFullscreen);
+        
+        btnCloak.addEventListener('click', openCloakModal);
+        
+        // Cloak modal events
+        closeModal.addEventListener('click', closeCloakModal);
+        cloakModal.addEventListener('click', (e) => {
+            if (e.target === cloakModal) {
+                closeCloakModal();
             }
-            
-            isFullscreen = true;
-            
-            // Update button text/icon
-            btnFullscreen.querySelector('.icon').textContent = 'fullscreen_exit';
-            btnFullscreen.querySelector('.text').textContent = 'Exit Fullscreen';
-        }
+        });
         
-        function exitFullscreen() {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            } else if (document.mozCancelFullScreen) {
-                document.mozCancelFullScreen();
-            } else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
-            }
-            
-            isFullscreen = false;
-            
-            // Update button text/icon
-            btnFullscreen.querySelector('.icon').textContent = 'fullscreen';
-            btnFullscreen.querySelector('.text').textContent = 'Fullscreen';
-            
-            collapseMenu();
-        }
+        defaultCloak.addEventListener('change', toggleCustomCloakOptions);
         
-        function handleFullscreenChange() {
-            isFullscreen = !!(document.fullscreenElement || 
-                            document.webkitFullscreenElement || 
-                            document.mozFullScreenElement || 
-                            document.msFullscreenElement);
-            
-            // Update button state
-            if (isFullscreen) {
-                btnFullscreen.querySelector('.icon').textContent = 'fullscreen_exit';
-                btnFullscreen.querySelector('.text').textContent = 'Exit Fullscreen';
-            } else {
-                btnFullscreen.querySelector('.icon').textContent = 'fullscreen';
-                btnFullscreen.querySelector('.text').textContent = 'Fullscreen';
-                collapseMenu();
-            }
-        }
+        uploadArea.addEventListener('click', () => {
+            fileUpload.click();
+        });
         
-        function openCloakModal() {
-            cloakModal.classList.add('active');
-            collapseMenu();
-        }
+        fileUpload.addEventListener('change', handleImageUpload);
         
-        function closeCloakModal() {
-            cloakModal.classList.remove('active');
-            loadCloakSettings(); // Reset to saved settings
-        }
-        
-        function toggleCustomCloakOptions() {
+        applyCloak.addEventListener('click', applyCloakSettings);
+        cancelCloak.addEventListener('click', () => {
+            // Check if default cloak is checked before closing
             if (defaultCloak.checked) {
-                customCloakOptions.classList.remove('expanded');
-            } else {
-                customCloakOptions.classList.add('expanded');
+                resetToDefaultCloak();
             }
+            closeCloakModal();
+        });
+        
+        // Redirect button
+        manualRedirect.addEventListener('click', () => {
+            window.location.href = 'https://www.jimmyqrg.com/signup/';
+        });
+        
+        // Fullscreen change listener
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    }
+    
+    function toggleMenuState() {
+        if (isMenuExpanded) {
+            collapseMenu();
+        } else {
+            expandMenu();
+        }
+    }
+    
+    function expandMenu() {
+        bottomMenu.classList.add('expanded');
+        toggleIcon.textContent = 'expand_more';
+        isMenuExpanded = true;
+    }
+    
+    function collapseMenu() {
+        bottomMenu.classList.remove('expanded');
+        toggleIcon.textContent = 'expand_less';
+        isMenuExpanded = false;
+    }
+    
+    function toggleSound() {
+        isSoundOn = !isSoundOn;
+        
+        if (isSoundOn) {
+            soundIcon.textContent = 'volume_up';
+            btnSound.querySelector('.text').textContent = 'Sound On';
+            // In a real implementation, you would unmute the iframe here
+            // Note: This is challenging due to browser security restrictions
+        } else {
+            soundIcon.textContent = 'volume_off';
+            btnSound.querySelector('.text').textContent = 'Sound Off';
+            // In a real implementation, you would mute the iframe here
+            // Note: This is challenging due to browser security restrictions
         }
         
-        function populateIconGrid() {
-            iconGrid.innerHTML = '';
+        collapseMenu();
+    }
+    
+    async function downloadSource() {
+        try {
+            // Check if user has pausd.us email
+            const userEmail = localStorage.getItem('userEmail') || '';
+            const hasPAUSDDomain = userEmail.endsWith('pausd.us');
             
-            iconOptions.forEach(icon => {
-                const iconElement = document.createElement('div');
-                iconElement.className = 'icon-option';
-                iconElement.dataset.icon = icon.url;
-                
-                const img = document.createElement('img');
-                img.className = 'icon-img';
-                img.src = icon.url;
-                img.alt = icon.name;
-                
-                const name = document.createElement('div');
-                name.className = 'icon-name';
-                name.textContent = icon.name;
-                
-                iconElement.appendChild(img);
-                iconElement.appendChild(name);
-                
-                iconElement.addEventListener('click', () => {
-                    document.querySelectorAll('.icon-option').forEach(opt => {
-                        opt.classList.remove('selected');
-                    });
-                    
-                    iconElement.classList.add('selected');
-                    selectedIcon = icon.url;
-                    
-                    // Clear any uploaded file
-                    fileUpload.value = '';
-                });
-                
-                iconGrid.appendChild(iconElement);
-            });
-            
-            // Select the first icon by default
-            if (iconGrid.firstElementChild) {
-                iconGrid.firstElementChild.classList.add('selected');
-            }
-        }
-        
-        function handleImageUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            if (!file.type.startsWith('image/')) {
-                showNotification('Invalid File', 'Please upload an image file.', 'error');
+            if (!hasPAUSDDomain) {
+                showNotification('Unable to download', 'An unknown error occurred while downloading.', 'error');
                 return;
             }
             
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                // Create a custom icon option for the uploaded image
-                const iconElement = document.createElement('div');
-                iconElement.className = 'icon-option selected';
-                
-                const img = document.createElement('img');
-                img.className = 'icon-img';
-                img.src = event.target.result;
-                img.alt = 'Custom Image';
-                
-                const name = document.createElement('div');
-                name.className = 'icon-name';
-                name.textContent = 'Custom';
-                
-                iconElement.appendChild(img);
-                iconElement.appendChild(name);
-                
-                // Clear previous selections
+            // Get current iframe URL
+            const iframeUrl = mainIframe.src;
+            
+            // Try to fetch the source code
+            const response = await fetch(iframeUrl);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const sourceCode = await response.text();
+            
+            // Create a blob and download link
+            const blob = new Blob([sourceCode], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'website_source.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Download Successful', 'Source code has been downloaded.', 'success');
+            
+        } catch (error) {
+            console.error('Download error:', error);
+            
+            if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                showNotification('Unable to fetch source', 'The website source code could not be accessed.', 'error');
+            } else {
+                showNotification('Unable to download', 'An unknown error occurred while downloading.', 'error');
+            }
+        }
+        
+        collapseMenu();
+    }
+    
+    function toggleFullscreen() {
+        if (!isFullscreen) {
+            enterFullscreen();
+        } else {
+            exitFullscreen();
+        }
+        
+        collapseMenu();
+    }
+    
+    function enterFullscreen() {
+        const iframeElement = mainIframe;
+        
+        // Use the Fullscreen API
+        if (iframeElement.requestFullscreen) {
+            iframeElement.requestFullscreen();
+        } else if (iframeElement.webkitRequestFullscreen) {
+            iframeElement.webkitRequestFullscreen();
+        } else if (iframeElement.mozRequestFullScreen) {
+            iframeElement.mozRequestFullScreen();
+        } else if (iframeElement.msRequestFullscreen) {
+            iframeElement.msRequestFullscreen();
+        }
+        
+        isFullscreen = true;
+        
+        // Update button text/icon
+        btnFullscreen.querySelector('.icon').textContent = 'fullscreen_exit';
+        btnFullscreen.querySelector('.text').textContent = 'Exit Fullscreen';
+    }
+    
+    function exitFullscreen() {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+        
+        isFullscreen = false;
+        
+        // Update button text/icon
+        btnFullscreen.querySelector('.icon').textContent = 'fullscreen';
+        btnFullscreen.querySelector('.text').textContent = 'Fullscreen';
+        
+        collapseMenu();
+    }
+    
+    function handleFullscreenChange() {
+        isFullscreen = !!(document.fullscreenElement || 
+                        document.webkitFullscreenElement || 
+                        document.mozFullScreenElement || 
+                        document.msFullscreenElement);
+        
+        // Update button state
+        if (isFullscreen) {
+            btnFullscreen.querySelector('.icon').textContent = 'fullscreen_exit';
+            btnFullscreen.querySelector('.text').textContent = 'Exit Fullscreen';
+        } else {
+            btnFullscreen.querySelector('.icon').textContent = 'fullscreen';
+            btnFullscreen.querySelector('.text').textContent = 'Fullscreen';
+            collapseMenu();
+        }
+    }
+    
+    function openCloakModal() {
+        cloakModal.classList.add('active');
+        collapseMenu();
+    }
+    
+    function closeCloakModal() {
+        cloakModal.classList.remove('active');
+        loadCloakSettings(); // Reset to saved settings
+    }
+    
+    function toggleCustomCloakOptions() {
+        if (defaultCloak.checked) {
+            customCloakOptions.classList.remove('expanded');
+            // Reset to default immediately when checkbox is checked
+            resetToDefaultCloak();
+            // Save the setting
+            localStorage.setItem('defaultCloak', 'true');
+        } else {
+            customCloakOptions.classList.add('expanded');
+            // Save the setting
+            localStorage.setItem('defaultCloak', 'false');
+        }
+    }
+    
+    function populateIconGrid() {
+        iconGrid.innerHTML = '';
+        
+        iconOptions.forEach(icon => {
+            const iconElement = document.createElement('div');
+            iconElement.className = 'icon-option';
+            iconElement.dataset.icon = icon.url;
+            
+            const img = document.createElement('img');
+            img.className = 'icon-img';
+            img.src = icon.url;
+            img.alt = icon.name;
+            
+            const name = document.createElement('div');
+            name.className = 'icon-name';
+            name.textContent = icon.name;
+            
+            iconElement.appendChild(img);
+            iconElement.appendChild(name);
+            
+            iconElement.addEventListener('click', () => {
                 document.querySelectorAll('.icon-option').forEach(opt => {
                     opt.classList.remove('selected');
                 });
                 
-                // Add to the grid
-                iconGrid.appendChild(iconElement);
+                iconElement.classList.add('selected');
+                selectedIcon = icon.url;
                 
-                // Set as selected
-                selectedIcon = event.target.result;
-                
-                // Scroll to show the new icon
-                iconElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                
-                // Add click handler
-                iconElement.addEventListener('click', () => {
-                    document.querySelectorAll('.icon-option').forEach(opt => {
-                        opt.classList.remove('selected');
-                    });
-                    
-                    iconElement.classList.add('selected');
-                    selectedIcon = event.target.result;
-                });
-            };
-            
-            reader.readAsDataURL(file);
-        }
-        
-        function loadCloakSettings() {
-            // Load saved settings from localStorage
-            const savedDefaultCloak = localStorage.getItem('defaultCloak');
-            const savedIcon = localStorage.getItem('cloakIcon');
-            const savedTabName = localStorage.getItem('cloakTabName');
-            
-            if (savedDefaultCloak !== null) {
-                defaultCloak.checked = savedDefaultCloak === 'true';
-                toggleCustomCloakOptions();
-            }
-            
-            if (savedIcon) {
-                selectedIcon = savedIcon;
-                
-                // Find and select the corresponding icon
-                document.querySelectorAll('.icon-option').forEach(opt => {
-                    opt.classList.remove('selected');
-                    if (opt.dataset.icon === savedIcon) {
-                        opt.classList.add('selected');
-                    }
-                });
-            }
-            
-            if (savedTabName) {
-                tabName.value = savedTabName;
-            }
-        }
-        
-        function applyCloakSettings() {
-            // Save settings
-            localStorage.setItem('defaultCloak', defaultCloak.checked);
-            localStorage.setItem('cloakIcon', selectedIcon);
-            localStorage.setItem('cloakTabName', tabName.value);
-            
-            // Apply cloak if default is off
-            if (!defaultCloak.checked) {
-                // Change tab title
-                if (tabName.value) {
-                    document.title = tabName.value;
-                }
-                
-                // Try to change favicon
-                try {
-                    let favicon = document.querySelector("link[rel*='icon']");
-                    if (!favicon) {
-                        favicon = document.createElement('link');
-                        favicon.rel = 'shortcut icon';
-                        document.head.appendChild(favicon);
-                    }
-                    
-                    // If the selected icon is a data URL (uploaded image), use it directly
-                    if (selectedIcon.startsWith('data:')) {
-                        favicon.href = selectedIcon;
-                    } else {
-                        // Otherwise, it's a URL
-                        favicon.href = selectedIcon;
-                    }
-                } catch (error) {
-                    console.log('Could not update favicon:', error);
-                }
-            }
-            
-            closeCloakModal();
-        }
-        
-        function showNotification(title, message, type = 'info') {
-            // Remove any existing notifications
-            const existingNotifications = document.querySelectorAll('.notification');
-            existingNotifications.forEach(notification => {
-                notification.remove();
+                // Clear any uploaded file
+                fileUpload.value = '';
             });
             
-            // Create new notification
-            const notification = document.createElement('div');
-            notification.className = `notification ${type === 'error' ? 'error' : ''}`;
-            
-            notification.innerHTML = `
-                <div class="notification-title">${title}</div>
-                <div class="notification-message">${message}</div>
-            `;
-            
-            notificationContainer.appendChild(notification);
-            
-            // Show notification
-            setTimeout(() => {
-                notification.classList.add('show');
-            }, 10);
-            
-            // Auto-remove after 5 seconds
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => {
-                    notification.remove();
-                }, 300);
-            }, 5000);
+            iconGrid.appendChild(iconElement);
+        });
+        
+        // Select the first icon by default
+        if (iconGrid.firstElementChild) {
+            iconGrid.firstElementChild.classList.add('selected');
+        }
+    }
+    
+    function handleImageUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        if (!file.type.startsWith('image/')) {
+            showNotification('Invalid File', 'Please upload an image file.', 'error');
+            return;
         }
         
-        // Initialize the application
-        init();
-    </script>
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            // Create a custom icon option for the uploaded image
+            const iconElement = document.createElement('div');
+            iconElement.className = 'icon-option selected';
+            
+            const img = document.createElement('img');
+            img.className = 'icon-img';
+            img.src = event.target.result;
+            img.alt = 'Custom Image';
+            
+            const name = document.createElement('div');
+            name.className = 'icon-name';
+            name.textContent = 'Custom';
+            
+            iconElement.appendChild(img);
+            iconElement.appendChild(name);
+            
+            // Clear previous selections
+            document.querySelectorAll('.icon-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add to the grid
+            iconGrid.appendChild(iconElement);
+            
+            // Set as selected
+            selectedIcon = event.target.result;
+            
+            // Scroll to show the new icon
+            iconElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            
+            // Add click handler
+            iconElement.addEventListener('click', () => {
+                document.querySelectorAll('.icon-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                iconElement.classList.add('selected');
+                selectedIcon = event.target.result;
+            });
+        };
+        
+        reader.readAsDataURL(file);
+    }
+    
+    // Add this new function to reset to default cloak
+    function resetToDefaultCloak() {
+        // Reset tab title to default
+        document.title = 'Dashboard | Jimmy Q.R.G.';
+        
+        // Reset favicon to default
+        try {
+            let favicon = document.querySelector("link[rel*='icon']");
+            if (favicon) {
+                favicon.href = 'https://www.jimmyqrg.com/icon.png';
+            }
+        } catch (error) {
+            console.log('Could not reset favicon:', error);
+        }
+    }
+    
+    function loadCloakSettings() {
+        // Load saved settings from localStorage
+        const savedDefaultCloak = localStorage.getItem('defaultCloak');
+        const savedIcon = localStorage.getItem('cloakIcon');
+        const savedTabName = localStorage.getItem('cloakTabName');
+        
+        if (savedDefaultCloak !== null) {
+            defaultCloak.checked = savedDefaultCloak === 'true';
+            toggleCustomCloakOptions();
+            
+            // Apply default cloak if it's enabled
+            if (defaultCloak.checked === true) {
+                resetToDefaultCloak();
+            } else if (savedTabName || savedIcon) {
+                // Apply custom cloak settings if they exist
+                if (savedTabName) {
+                    document.title = savedTabName;
+                }
+                
+                if (savedIcon) {
+                    try {
+                        let favicon = document.querySelector("link[rel*='icon']");
+                        if (!favicon) {
+                            favicon = document.createElement('link');
+                            favicon.rel = 'shortcut icon';
+                            document.head.appendChild(favicon);
+                        }
+                        favicon.href = savedIcon;
+                    } catch (error) {
+                        console.log('Could not load saved favicon:', error);
+                    }
+                }
+            }
+        }
+        
+        if (savedIcon) {
+            selectedIcon = savedIcon;
+            
+            // Find and select the corresponding icon
+            document.querySelectorAll('.icon-option').forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.dataset.icon === savedIcon) {
+                    opt.classList.add('selected');
+                }
+            });
+        }
+        
+        if (savedTabName) {
+            tabName.value = savedTabName;
+        }
+    }
+    
+    function applyCloakSettings() {
+        // Save settings
+        localStorage.setItem('defaultCloak', defaultCloak.checked);
+        localStorage.setItem('cloakIcon', selectedIcon);
+        localStorage.setItem('cloakTabName', tabName.value);
+        
+        // Apply or reset cloak based on default setting
+        if (!defaultCloak.checked) {
+            // Apply custom cloak settings
+            // Change tab title
+            if (tabName.value) {
+                document.title = tabName.value;
+            }
+            
+            // Try to change favicon
+            try {
+                let favicon = document.querySelector("link[rel*='icon']");
+                if (!favicon) {
+                    favicon = document.createElement('link');
+                    favicon.rel = 'shortcut icon';
+                    document.head.appendChild(favicon);
+                }
+                
+                // If the selected icon is a data URL (uploaded image), use it directly
+                if (selectedIcon.startsWith('data:')) {
+                    favicon.href = selectedIcon;
+                } else {
+                    // Otherwise, it's a URL
+                    favicon.href = selectedIcon;
+                }
+            } catch (error) {
+                console.log('Could not update favicon:', error);
+            }
+        } else {
+            // Reset to default cloak settings
+            resetToDefaultCloak();
+        }
+        
+        closeCloakModal();
+    }
+    
+    function showNotification(title, message, type = 'info') {
+        // Remove any existing notifications
+        const existingNotifications = document.querySelectorAll('.notification');
+        existingNotifications.forEach(notification => {
+            notification.remove();
+        });
+        
+        // Create new notification
+        const notification = document.createElement('div');
+        notification.className = `notification ${type === 'error' ? 'error' : ''}`;
+        
+        notification.innerHTML = `
+            <div class="notification-title">${title}</div>
+            <div class="notification-message">${message}</div>
+        `;
+        
+        notificationContainer.appendChild(notification);
+        
+        // Show notification
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 10);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 5000);
+    }
+    
+    // Initialize the application
+    init();
+</script>
 </body>
 </html>
