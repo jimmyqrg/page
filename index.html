@@ -712,7 +712,9 @@
                     localStorage.setItem('userEmail', email);
                 } else {
                     // User rejected access, assume pausd.org
-                    hasPAUSDDomain = true;
+                    // hasPAUSDDomain = true;
+                    // Nevermind it's useless
+                    hasPAUSDDomain = false;
                 }
             }
         } catch (error) {
