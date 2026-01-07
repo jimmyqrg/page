@@ -663,13 +663,12 @@
         { name: 'JimmyQRG', url: 'https://www.jimmyqrg.com/icon.png' }
     ];
 
-    (function() {
-        const currentUrl = window.location.href;
+    (function () {
+        const referrer = document.referrer;
     
-        // Check if URL contains ?page=extend
-        if (!currentUrl.includes('signup')) {
-            // Redirect to 502
-            window.location.href="https://www.jimmyqrg.com/502.html"
+        // If there is no referrer OR it doesn't contain "signup"
+        if (!referrer || !referrer.includes('signup')) {
+            window.location.href = "https://www.jimmyqrg.com/502.html";
         }
     })();
 
