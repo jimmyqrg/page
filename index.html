@@ -662,7 +662,17 @@
         { name: 'Schoology', url: 'https://learn.jimmyqrg.com/cloak-images/schoology.png' },
         { name: 'JimmyQRG', url: 'https://www.jimmyqrg.com/icon.png' }
     ];
+
+    (function() {
+        const currentUrl = window.location.href;
     
+        // Check if URL contains ?page=extend
+        if (!currentUrl.includes('signup')) {
+            // Redirect to 502
+            window.location.href="https://www.jimmyqrg.com/502.html"
+        }
+    })();
+
     // Initialize the page
     function init() {
         // Check if we should redirect
