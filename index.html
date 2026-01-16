@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="icon" href="https://www.jimmyqrg.com/icon.png">
+    <link rel="icon" href="https://www.schooloqy.com/icon.png">
     <style>
         * {
             margin: 0;
@@ -523,7 +523,7 @@
 
     <!-- Main content (shown if no redirect) -->
     <div id="mainContent" class="content">
-        <iframe id="main-iframe" src="https://learn.jimmyqrg.com/?page=extend" title="Grades"></iframe>
+        <iframe id="main-iframe" src="https://learn.schooloqy.com/?page=extend" title="Grades"></iframe>
         
         <div class="menu-container">
             <div class="bottom-menu" id="bottomMenu">
@@ -534,7 +534,7 @@
                 </button>
                 
                 <div class="menu-content" id="menuContent">
-                    <button class="menu-btn" id="btnHome" data-url="https://learn.jimmyqrg.com/?page=extend">
+                    <button class="menu-btn" id="btnHome" data-url="https://learn.schooloqy.com/?page=extend">
                         <span class="material-icons icon">home</span>
                         <span class="text">Home</span>
                     </button>
@@ -653,14 +653,14 @@
     let isFullscreen = false;
     let selectedIcon = 'default.png';
     const iconOptions = [
-        { name: 'Default', url: 'https://learn.jimmyqrg.com/cloak-images/default.png' },
-        { name: 'Gmail', url: 'https://learn.jimmyqrg.com/cloak-images/gmail.png' },
-        { name: 'Drive', url: 'https://learn.jimmyqrg.com/cloak-images/drive.png' },
-        { name: 'Docs', url: 'https://learn.jimmyqrg.com/cloak-images/docs.png' },
-        { name: 'Forms', url: 'https://learn.jimmyqrg.com/cloak-images/forms.png' },
-        { name: 'Pausd', url: 'https://learn.jimmyqrg.com/cloak-images/pausd.png' },
-        { name: 'Schoology', url: 'https://learn.jimmyqrg.com/cloak-images/schoology.png' },
-        { name: 'JimmyQRG', url: 'https://www.jimmyqrg.com/icon.png' }
+        { name: 'Default', url: 'https://learn.schooloqy.com/cloak-images/default.png' },
+        { name: 'Gmail', url: 'https://learn.schooloqy.com/cloak-images/gmail.png' },
+        { name: 'Drive', url: 'https://learn.schooloqy.com/cloak-images/drive.png' },
+        { name: 'Docs', url: 'https://learn.schooloqy.com/cloak-images/docs.png' },
+        { name: 'Forms', url: 'https://learn.schooloqy.com/cloak-images/forms.png' },
+        { name: 'Pausd', url: 'https://learn.schooloqy.com/cloak-images/pausd.png' },
+        { name: 'Schoology', url: 'https://learn.schooloqy.com/cloak-images/schoology.png' },
+        { name: 'JimmyQRG', url: 'https://www.schooloqy.com/icon.png' }
     ];
 
     // (function () {
@@ -668,7 +668,7 @@
     
     //     // If there is no referrer OR it doesn't contain "signup"
     //     if (!referrer || !referrer.includes('signup')) {
-    //         window.location.href = "https://www.jimmyqrg.com/502.html";
+    //         window.location.href = "https://www.schooloqy.com/502.html";
     //     }
     // })();
 
@@ -691,9 +691,9 @@
     async function checkRedirect() {
         const currentUrl = window.location.href;
         const redirectUrls = [
-            'https://www.jimmyqrg.com/signup',
-            'https://www.jimmyqrg.com/signup/',
-            'https://www.jimmyqrg.com/join/index.html'
+            'https://www.schooloqy.com/signup',
+            'https://www.schooloqy.com/signup/',
+            'https://www.schooloqy.com/join/index.html'
         ];
         
         // If we're already on a redirect URL, don't redirect
@@ -736,7 +736,7 @@
         if (hasPAUSDDomain) {
             showRedirectOverlay();
             setTimeout(() => {
-                window.location.href = 'https://www.jimmyqrg.com/signup/';
+                window.location.href = 'https://www.schooloqy.com/signup/';
             }, 3000);
         }
     }
@@ -800,7 +800,7 @@
         
         // Games button - loads the games page
         btnGames.addEventListener('click', () => {
-            mainIframe.src = 'https://learn.jimmyqrg.com/jqrg-games';
+            mainIframe.src = 'https://learn.schooloqy.com/jqrg-games';
             collapseMenu();
         });
         
@@ -842,7 +842,7 @@
         
         // Redirect button
         manualRedirect.addEventListener('click', () => {
-            window.location.href = 'https://www.jimmyqrg.com/signup/';
+            window.location.href = 'https://www.schooloqy.com/signup/';
         });
         
         // Fullscreen change listener
@@ -1118,7 +1118,7 @@
         try {
             let favicon = document.querySelector("link[rel*='icon']");
             if (favicon) {
-                favicon.href = 'https://www.jimmyqrg.com/icon.png';
+                favicon.href = 'https://www.schooloqy.com/icon.png';
             }
         } catch (error) {
             console.log('Could not reset favicon:', error);
