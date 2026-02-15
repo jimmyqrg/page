@@ -525,7 +525,7 @@
 
     <!-- Main content (shown if no redirect) -->
     <div id="mainContent" class="content">
-        <iframe id="main-iframe" src="https://jimmyqrg.github.io/?page=extend" title="Grades"></iframe>
+        <iframe id="main-iframe" src="/?page=extend" title="Grades"></iframe>
         
         <div class="menu-container">
             <div class="bottom-menu" id="bottomMenu">
@@ -536,7 +536,7 @@
                 </button>
                 
                 <div class="menu-content" id="menuContent">
-                    <button class="menu-btn" id="btnHome" data-url="https://jimmyqrg.github.io/?page=extend">
+                    <button class="menu-btn" id="btnHome" data-url="/?page=extend">
                         <span class="material-icons icon">home</span>
                         <span class="text">Home</span>
                     </button>
@@ -655,14 +655,13 @@
     let isFullscreen = false;
     let selectedIcon = 'default.png';
     const iconOptions = [
-        { name: 'Default', url: 'https://jimmyqrg.github.io/cloak-images/default.png' },
-        { name: 'Gmail', url: 'https://jimmyqrg.github.io/cloak-images/gmail.png' },
-        { name: 'Drive', url: 'https://jimmyqrg.github.io/cloak-images/drive.png' },
-        { name: 'Docs', url: 'https://jimmyqrg.github.io/cloak-images/docs.png' },
-        { name: 'Forms', url: 'https://jimmyqrg.github.io/cloak-images/forms.png' },
-        { name: 'Pausd', url: 'https://jimmyqrg.github.io/cloak-images/pausd.png' },
-        { name: 'Schoology', url: 'https://jimmyqrg.github.io/cloak-images/schoology.png' },
-        { name: 'JimmyQRG', url: 'https://www.schooloqy.com/icon.png' }
+        { name: 'Default', url: '/cloak-images/default.png' },
+        { name: 'Gmail', url: '/cloak-images/gmail.png' },
+        { name: 'Drive', url: '/cloak-images/drive.png' },
+        { name: 'Docs', url: '/cloak-images/docs.png' },
+        { name: 'Forms', url: '/cloak-images/forms.png' },
+        { name: 'Pausd', url: '/cloak-images/pausd.png' },
+        { name: 'Schoology', url: '/cloak-images/schoology.png' },
     ];
 
     // (function () {
@@ -802,7 +801,7 @@
         
         // Games button - loads the games page
         btnGames.addEventListener('click', () => {
-            mainIframe.src = 'https://jimmyqrg.github.io/jqrg-games';
+            mainIframe.src = '/jqrg-games';
             collapseMenu();
         });
         
